@@ -1,6 +1,6 @@
 # Sealed — Fully-Encrypted Vickrey Auctions on FHEVM
 
-> The first fully-encrypted second-price (Vickrey) sealed-bid auction on Zama's FHEVM. Every bid stays confidential forever — even after the auction ends. Only the winner's address and the second-highest price are revealed.
+> A fully-encrypted second-price (Vickrey) sealed-bid auction on Zama's FHEVM, deployed on Sepolia with a self-service faucet and on-chain privacy verification. Every bid stays confidential forever — even after the auction ends. Only the winner's address and the second-highest price are revealed.
 
 Built for **Zama Developer Program Mainnet Season 3** — Builder Track.
 
@@ -23,13 +23,14 @@ On a public blockchain, this was impossible. Even with commit-reveal schemes, bi
 
 ### The FHEVM wedge
 
-Previous FHEVM auction implementations (e.g., Zama Season 7 hackathon projects) used **partial hiding** — prices were public, only quantities were encrypted. Sorting-based first-price auctions were deemed too computationally expensive for FHEVM.
+FHEVM auction implementations often use **partial hiding** — prices are public, only quantities are encrypted. Sorting-based single-price auctions are computationally expensive in FHE.
 
 **Sealed** takes a different approach:
 
-1. **Vickrey, not first-price** — no sorting required. Finding the max and second-max is O(n) with `FHE.max` and `FHE.select` (fold-and-mask), vs. O(n log n) for sorting.
+1. **Vickrey, not single-price** — no sorting required. Finding the max and second-max is O(n) with `FHE.max` and `FHE.select` (fold-and-mask), vs. O(n log n) for sorting.
 2. **All bids fully encrypted** — not just quantities. The bid amount, the winner identity, and the second price are all computed in the encrypted domain.
 3. **Minimal revelation** — only the winner address and second price are revealed via public decryption. Every individual bid (including the winning bid) stays encrypted forever.
+4. **Live on Sepolia** with a built-in faucet — anyone can mint test NFTs and cUSDC, create auctions, and verify privacy directly on-chain.
 
 ## How it works
 

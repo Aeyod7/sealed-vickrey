@@ -28,9 +28,9 @@ blockchain, this was impossible.
 ### [0:30–1:00] The Solution
 
 **Narration:**
-Sealed is the first fully-encrypted Vickrey auction on Zama's FHEVM. Every bid
-is encrypted with Fully Homomorphic Encryption and stays encrypted forever —
-even after the auction ends.
+Sealed is a fully-encrypted Vickrey auction on Zama's FHEVM, deployed on Sepolia.
+Every bid is encrypted with Fully Homomorphic Encryption and stays encrypted
+forever — even after the auction ends.
 
 The contract computes the winner and second-highest price on encrypted data
 using a fold-and-mask algorithm — O(n) with no sorting required. This was
@@ -77,9 +77,8 @@ The key innovation is the fold-and-mask algorithm for finding the second-highest
 bid without sorting. For each bid, we do one encrypted comparison, two selects,
 and one max — three FHE operations per bid, O(n) total.
 
-This is what makes Vickrey auctions feasible on FHEVM, where previous
-implementations used partial hiding — encrypting quantities but leaving prices
-public.
+This makes Vickrey auctions feasible on FHEVM, where sorting-based approaches
+are expensive. Sealed keeps every bid quantity and identity fully encrypted.
 
 The contract uses OpenZeppelin's ERC-7984 confidential tokens for encrypted
 payments, and the Zama React SDK for client-side encryption and user decryption.

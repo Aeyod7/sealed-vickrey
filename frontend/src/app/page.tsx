@@ -62,7 +62,7 @@ export default function Home() {
               </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-snow leading-tight">
-              The first fully-encrypted{" "}
+              A fully-encrypted{" "}
               <span className="text-acid-lime">Vickrey auction</span> on FHEVM
             </h2>
             <p className="text-base text-fog max-w-2xl leading-relaxed">

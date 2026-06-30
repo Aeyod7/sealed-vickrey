@@ -2,7 +2,7 @@
 
 ## Thread
 
-1/ Introducing **Sealed** — the first fully-encrypted Vickrey (second-price) auction on @zama_fhe's FHEVM.
+1/ Introducing **Sealed** — a fully-encrypted Vickrey (second-price) auction on @zama_fhe's FHEVM, live on Sepolia.
 
 Every bid stays encrypted forever. The winner and price are computed on encrypted data. No sorting required.
 
