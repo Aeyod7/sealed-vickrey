@@ -12,97 +12,135 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-4">
+      <header className="border-b border-graphite/60 backdrop-blur-sm px-6 py-4 sticky top-0 z-20 bg-onyx/80">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">
-              Sealed
-              <span className="text-indigo-400">.</span>
-            </h1>
-            <p className="text-xs text-zinc-500">
-              Vickrey auctions on FHEVM — every bid stays encrypted forever
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg border border-graphite flex items-center justify-center bg-charcoal">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M3 8L6 11L13 4"
+                  stroke="var(--color-acid-lime)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <rect
+                  x="1"
+                  y="1"
+                  width="14"
+                  height="14"
+                  rx="3"
+                  stroke="var(--color-graphite)"
+                  strokeWidth="1"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-base font-medium tracking-tight text-snow">
+                Sealed
+              </h1>
+              <p className="text-[11px] text-slate tracking-wide">
+                Vickrey auctions on FHEVM
+              </p>
+            </div>
           </div>
           <WalletConnect />
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 px-6 py-8">
-        <div className="max-w-5xl mx-auto space-y-8">
-          {/* Pitch banner */}
-          <div className="rounded-xl border border-indigo-900/50 bg-indigo-950/30 p-6">
-            <h2 className="text-lg font-semibold mb-2">
-              The first fully-encrypted Vickrey auction on FHEVM
+      <main className="flex-1 px-6 py-10">
+        <div className="max-w-5xl mx-auto space-y-10">
+          {/* Hero */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="badge badge-open">Live on Sepolia</span>
+              <span className="text-[11px] text-slate mono">
+                Zama Developer Program · Season 3
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-snow leading-tight">
+              The first fully-encrypted{" "}
+              <span className="text-acid-lime">Vickrey auction</span> on FHEVM
             </h2>
-            <p className="text-sm text-zinc-400">
+            <p className="text-base text-fog max-w-2xl leading-relaxed">
               Bids are encrypted with Fully Homomorphic Encryption. The contract
               computes the winner and second-highest price on encrypted data —
               no sorting required, just O(n) fold-and-mask. Only the winner
-              address and second price are revealed. Every individual bid,
-              including the winning amount, stays confidential forever. Truthful
-              bidding is the dominant strategy — impossible onchain until FHE.
+              address and second price are revealed. Every individual bid stays
+              confidential forever.
             </p>
-          </div>
+          </section>
 
           {/* Action grid */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <section className="grid md:grid-cols-2 gap-4">
             <CreateAuction />
             <PlaceBid />
             <SettleAuction />
             <AmIWinner />
-          </div>
+          </section>
 
+          {/* Claim / Withdraw */}
           <ClaimWithdraw />
 
           {/* Auction list */}
           <AuctionList />
 
           {/* How it works */}
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-            <h2 className="text-lg font-semibold mb-4">How It Works</h2>
-            <ol className="space-y-3 text-sm text-zinc-400">
-              <li>
-                <span className="text-indigo-400 font-mono mr-2">1.</span>
-                <strong className="text-zinc-200">Create</strong> — Seller
-                escrows an NFT and sets a reserve + duration.
-              </li>
-              <li>
-                <span className="text-indigo-400 font-mono mr-2">2.</span>
-                <strong className="text-zinc-200">Bid</strong> — Bidders submit
-                encrypted bids in cUSDC. No one can see any bid.
-              </li>
-              <li>
-                <span className="text-indigo-400 font-mono mr-2">3.</span>
-                <strong className="text-zinc-200">Settle</strong> — After the
-                auction ends, the contract computes max + second-max via O(n)
-                fold-and-mask (no sorting). Winner address is computed in the
-                encrypted domain.
-              </li>
-              <li>
-                <span className="text-indigo-400 font-mono mr-2">4.</span>
-                <strong className="text-zinc-200">Finalize</strong> — Public
-                decryption reveals only the winner address + second price. All
-                bids stay private.
-              </li>
-              <li>
-                <span className="text-indigo-400 font-mono mr-2">5.</span>
-                <strong className="text-zinc-200">Check</strong> — Bidders
-                privately check &ldquo;did I win?&rdquo; via EIP-712 user
-                decryption.
-              </li>
-              <li>
-                <span className="text-indigo-400 font-mono mr-2">6.</span>
-                <strong className="text-zinc-200">Claim / Withdraw</strong> —
-                Winner pays the second price (not their bid) and gets the lot +
-                refund. Losers withdraw their full bid. All encrypted.
-              </li>
-            </ol>
-          </div>
+          <section className="card p-8">
+            <h3 className="heading text-lg mb-6">How it works</h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  step: "01",
+                  title: "Create",
+                  desc: "Seller escrows an NFT and sets a reserve + duration. The lot is held in the contract.",
+                },
+                {
+                  step: "02",
+                  title: "Bid",
+                  desc: "Bidders submit encrypted bids in cUSDC. The bid amount is encrypted client-side — no one can see it.",
+                },
+                {
+                  step: "03",
+                  title: "Settle",
+                  desc: "After the auction ends, the contract computes max + second-max via O(n) fold-and-mask on encrypted data.",
+                },
+                {
+                  step: "04",
+                  title: "Finalize",
+                  desc: "Public decryption reveals only the winner address + second price. All bids stay encrypted forever.",
+                },
+                {
+                  step: "05",
+                  title: "Check",
+                  desc: "Bidders privately check “did I win?” via EIP-712 user decryption. Only they learn the result.",
+                },
+                {
+                  step: "06",
+                  title: "Claim",
+                  desc: "Winner pays the second price (not their bid) and gets the lot + refund. Losers withdraw their full bid.",
+                },
+              ].map((item) => (
+                <div key={item.step} className="space-y-2">
+                  <div className="flex items-baseline gap-2">
+                    <span className="mono text-xs text-indigo">{item.step}</span>
+                    <h4 className="text-sm font-medium text-snow tracking-tight">
+                      {item.title}
+                    </h4>
+                  </div>
+                  <p className="text-[13px] text-fog leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Footer */}
-          <footer className="text-center text-xs text-zinc-600 py-4">
-            Built for Zama Developer Program Season 3 · Powered by FHEVM
+          <footer className="text-center text-[11px] text-slate py-6 border-t border-graphite/40">
+            Built for Zama Developer Program Season 3 · Powered by FHEVM ·
+            Every bid stays encrypted forever
           </footer>
         </div>
       </main>

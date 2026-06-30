@@ -27,17 +27,12 @@ export function PlaceBid() {
       const auctionId = formData.get("auctionId") as string;
       const bidAmount = formData.get("bidAmount") as string;
 
-      // 1. Encrypt the bid amount — contract address must be the bid token
-      //    because the encrypted value is used in confidentialTransferAndCall
       const { encryptedValues, inputProof } = await encrypt.mutateAsync({
         values: [{ value: BigInt(bidAmount), type: "euint64" }],
         contractAddress: BID_TOKEN_ADDRESS,
         userAddress: address,
       });
 
-      // 2. Call confidentialTransferAndCall on the bid token
-      //    This transfers the encrypted bid to the auction contract and
-      //    triggers the onConfidentialTransferReceived callback with the auctionId
       const tx = await sdk.signer!.writeContract({
         address: BID_TOKEN_ADDRESS,
         abi: [
@@ -75,51 +70,54 @@ export function PlaceBid() {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <h2 className="text-lg font-semibold mb-4">Place Sealed Bid</h2>
+    <div className="card p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="heading text-base">Place Sealed Bid</h3>
+        <span className="text-[11px] text-slate mono">02</span>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1">Auction ID</label>
+        <div className="space-y-1.5">
+          <label className="label block">Auction ID</label>
           <input
             name="auctionId"
             type="number"
             placeholder="e.g. 1"
             required
-            className="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+            className="input w-full px-3 py-2"
           />
         </div>
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1">
-            Bid Amount (cUSDC units)
-          </label>
+        <div className="space-y-1.5">
+          <label className="label block">Bid Amount</label>
           <input
             name="bidAmount"
             type="number"
             placeholder="Your encrypted bid"
             required
-            className="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+            className="input w-full px-3 py-2"
           />
-          <p className="mt-1 text-xs text-zinc-500">
-            Your bid is encrypted client-side. No one can see it — not even the
-            auction contract.
+          <p className="text-[11px] text-slate">
+            Encrypted client-side. No one can see your bid — not even the
+            contract.
           </p>
         </div>
         <button
           type="submit"
           disabled={isPending || encrypt.isPending || !address}
-          className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors disabled:opacity-50 text-sm font-medium"
+          className="btn-primary w-full px-4 py-2.5 text-sm"
         >
           {isPending || encrypt.isPending
             ? "Encrypting & bidding..."
             : "Place Encrypted Bid"}
         </button>
       </form>
+
       {txHash && (
-        <p className="mt-3 text-sm text-green-400">
-          Bid placed! TX: {txHash.slice(0, 18)}...
+        <p className="text-[12px] text-success mono">
+          ✓ Bid placed · {txHash.slice(0, 18)}...
         </p>
       )}
-      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+      {error && <p className="text-[12px] text-error">{error}</p>}
     </div>
   );
 }

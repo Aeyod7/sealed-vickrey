@@ -1,26 +1,261 @@
 @import "tailwindcss";
 
+/* ────────────────────────────────────────────────────────────────── */
+/*  Design tokens — Linear color palette + Raycast depth             */
+/* ────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Neutrals — Linear scale */
+  --color-onyx: #08090a;
+  --color-charcoal: #0f1011;
+  --color-obsidian: #161718;
+  --color-graphite: #23252a;
+  --color-iron: #323334;
+  --color-steel: #383b3f;
+  --color-slate: #62666d;
+  --color-fog: #8a8f98;
+  --color-mist: #d0d6e0;
+  --color-snow: #f7f8f8;
+
+  /* Brand accents — Linear */
+  --color-acid-lime: #e4f222;
+  --color-indigo: #5e6ad2;
+
+  /* Semantic accents */
+  --color-emerald: #27a644;
+  --color-crimson: #eb5757;
+  --color-amber: #f59e0b;
+
+  /* Atmosphere — Raycast radial gradients */
+  --glow-blue: rgba(56, 194, 255, 0.08);
+  --glow-violet: rgba(94, 106, 210, 0.06);
+
+  /* Shadows — Raycast keyboard-key depth */
+  --shadow-card: 0 0 0 1px var(--color-graphite), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 0 0 1px var(--color-iron), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-pressable: rgba(0, 0, 0, 0.4) 0px 1.5px 0.5px 2.5px,
+    rgb(0, 0, 0) 0px 0px 0.5px 1px,
+    rgba(0, 0, 0, 0.25) 0px 2px 1px 1px inset,
+    rgba(255, 255, 255, 0.06) 0px 1px 1px 1px inset;
+  --shadow-lime-glow: 0 0 20px rgba(228, 242, 34, 0.15);
+
+  --background: var(--color-onyx);
+  --foreground: var(--color-snow);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-onyx: var(--color-onyx);
+  --color-charcoal: var(--color-charcoal);
+  --color-obsidian: var(--color-obsidian);
+  --color-graphite: var(--color-graphite);
+  --color-iron: var(--color-iron);
+  --color-steel: var(--color-steel);
+  --color-slate: var(--color-slate);
+  --color-fog: var(--color-fog);
+  --color-mist: var(--color-mist);
+  --color-snow: var(--color-snow);
+  --color-acid-lime: var(--color-acid-lime);
+  --color-indigo: var(--color-indigo);
+  --color-emerald: var(--color-emerald);
+  --color-crimson: var(--color-crimson);
+  --color-amber: var(--color-amber);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ────────────────────────────────────────────────────────────────── */
+/*  Base styles                                                      */
+/* ────────────────────────────────────────────────────────────────── */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-onyx);
+  color: var(--color-snow);
+  font-family: var(--font-geist-sans), Inter, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Atmosphere — Raycast-style radial glows behind content */
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--glow-violet), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 100%, var(--glow-blue), transparent);
+}
+
+/* ────────────────────────────────────────────────────────────────── */
+/*  Component styles                                                 */
+/* ────────────────────────────────────────────────────────────────── */
+
+/* Cards — Linear inset border + Raycast shadow depth */
+.card {
+  background: var(--color-charcoal);
+  border: 1px solid var(--color-graphite);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--color-iron);
+}
+
+/* Primary button — Acid Lime (rationed: one per screen section) */
+.btn-primary {
+  background: var(--color-acid-lime);
+  color: var(--color-onyx);
+  font-weight: 590;
+  letter-spacing: -0.01em;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow-lime-glow);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 28px rgba(228, 242, 34, 0.25);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+/* Secondary button — monochrome, pressable */
+.btn-secondary {
+  background: var(--color-steel);
+  color: var(--color-snow);
+  font-weight: 510;
+  border-radius: 8px;
+  border: 1px solid var(--color-iron);
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-iron);
+  border-color: var(--color-slate);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+}
+
+/* Inputs — Linear style */
+.input {
+  background: var(--color-obsidian);
+  border: 1px solid var(--color-graphite);
+  border-radius: 6px;
+  color: var(--color-snow);
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-indigo);
+}
+
+.input::placeholder {
+  color: var(--color-slate);
+}
+
+/* Labels */
+.label {
+  color: var(--color-fog);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Mono text for addresses, IDs */
+.mono {
+  font-family: var(--font-geist-mono), "JetBrains Mono", monospace;
+  letter-spacing: -0.02em;
+}
+
+/* Status badges */
+.badge {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.badge-open {
+  background: rgba(39, 166, 68, 0.15);
+  color: var(--color-emerald);
+  border: 1px solid rgba(39, 166, 68, 0.3);
+}
+
+.badge-ended {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-settled {
+  background: rgba(94, 106, 210, 0.15);
+  color: var(--color-indigo);
+  border: 1px solid rgba(94, 106, 210, 0.3);
+}
+
+.badge-finalized {
+  background: rgba(94, 106, 210, 0.15);
+  color: var(--color-indigo);
+  border: 1px solid rgba(94, 106, 210, 0.3);
+}
+
+.badge-closed {
+  background: var(--color-steel);
+  color: var(--color-slate);
+  border: 1px solid var(--color-iron);
+}
+
+/* Section headings */
+.heading {
+  font-weight: 510;
+  letter-spacing: -0.02em;
+  color: var(--color-snow);
+}
+
+/* Muted text */
+.muted {
+  color: var(--color-fog);
+}
+
+/* Success/error text */
+.text-success {
+  color: var(--color-emerald);
+}
+
+.text-error {
+  color: var(--color-crimson);
+}
+
+.text-status {
+  color: var(--color-indigo);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-onyx);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-graphite);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-iron);
 }

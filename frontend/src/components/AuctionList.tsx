@@ -6,6 +6,7 @@ import { sealedVickreyABI } from "@/lib/abi";
 import { SEALED_VICKREY_ADDRESS } from "@/lib/config";
 
 const STATE_NAMES = ["Open", "Settled", "Finalized", "Closed"];
+const STATE_BADGES = ["badge-open", "badge-ended", "badge-finalized", "badge-closed"];
 
 export function AuctionList() {
   const sdk = useZamaSDK();
@@ -71,91 +72,92 @@ export function AuctionList() {
   const now = Math.floor(Date.now() / 1000);
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Auctions ({auctionCount.toString()})</h2>
+    <section className="card p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h3 className="heading text-base">Auctions</h3>
+          <span className="mono text-[11px] text-slate">
+            {auctionCount.toString()} total
+          </span>
+        </div>
         <button
           onClick={refresh}
           disabled={loading}
-          className="px-3 py-1.5 text-sm rounded-lg border border-zinc-700 hover:bg-zinc-800 transition-colors"
+          className="btn-secondary px-3 py-1.5 text-xs"
         >
           {loading ? "Loading..." : "Refresh"}
         </button>
       </div>
 
       {auctions.length === 0 && !loading && (
-        <p className="text-sm text-zinc-500">No auctions yet. Create one above.</p>
+        <p className="text-[13px] text-slate py-4 text-center">
+          No auctions yet. Create one above.
+        </p>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {auctions.map((a) => {
           const ended = now >= Number(a.endTime);
           const stateName = STATE_NAMES[a.state] || "Unknown";
           const lotKindName = a.lotKind === 0 ? "NFT" : "ERC20";
+          const badgeClass = ended && a.state === 0 ? "badge-ended" : STATE_BADGES[a.state];
+          const displayState = ended && a.state === 0 ? "Ended" : stateName;
 
           return (
             <div
               key={a.id}
-              className="rounded-lg border border-zinc-800 bg-zinc-800/30 p-4"
+              className="rounded-lg border border-graphite bg-obsidian/50 p-4 hover:border-iron transition-colors"
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-mono text-sm text-indigo-400">
-                  Auction #{a.id.toString()}
-                </span>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full ${
-                    a.state === 0
-                      ? ended
-                        ? "bg-amber-900/50 text-amber-300"
-                        : "bg-green-900/50 text-green-300"
-                      : a.state === 3
-                        ? "bg-zinc-700 text-zinc-400"
-                        : "bg-blue-900/50 text-blue-300"
-                  }`}
-                >
-                  {a.state === 0 && ended ? "Ended" : stateName}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs text-zinc-400">
-                <div>
-                  <span className="text-zinc-500">Seller:</span>{" "}
-                  <span className="font-mono">
-                    {a.seller.slice(0, 8)}...{a.seller.slice(-4)}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="mono text-sm text-indigo">
+                    #{a.id.toString()}
+                  </span>
+                  <span className="text-[11px] text-slate">
+                    {lotKindName} #{a.lotIdentifier.toString()}
                   </span>
                 </div>
-                <div>
-                  <span className="text-zinc-500">Lot:</span> {lotKindName} #
-                  {a.lotIdentifier.toString()}
-                </div>
-                <div>
-                  <span className="text-zinc-500">Bids:</span>{" "}
-                  {a.bidCount.toString()}
-                </div>
-                <div>
-                  <span className="text-zinc-500">Reserve:</span>{" "}
-                  {a.reservePrice.toString()}
-                </div>
-                {a.state >= 2 && a.winner !== "0x0000000000000000000000000000000000000000" && (
-                  <>
-                    <div className="col-span-2">
-                      <span className="text-zinc-500">Winner:</span>{" "}
-                      <span className="font-mono text-green-400">
-                        {a.winner.slice(0, 10)}...{a.winner.slice(-6)}
-                      </span>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-zinc-500">Winning Price:</span>{" "}
-                      <span className="text-green-400">
-                        {a.winningPrice.toString()} cUSDC
-                      </span>
-                    </div>
-                  </>
-                )}
+                <span className={`badge ${badgeClass}`}>{displayState}</span>
               </div>
+
+              <div className="grid grid-cols-3 gap-3 text-[12px]">
+                <div>
+                  <div className="text-slate mb-0.5">Seller</div>
+                  <div className="mono text-fog">
+                    {a.seller.slice(0, 6)}...{a.seller.slice(-4)}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-slate mb-0.5">Bids</div>
+                  <div className="text-snow mono">{a.bidCount.toString()}</div>
+                </div>
+                <div>
+                  <div className="text-slate mb-0.5">Reserve</div>
+                  <div className="text-snow mono">{a.reservePrice.toString()}</div>
+                </div>
+              </div>
+
+              {a.state >= 2 &&
+                a.winner !== "0x0000000000000000000000000000000000000000" && (
+                  <div className="mt-3 pt-3 border-t border-graphite/60 grid grid-cols-2 gap-3 text-[12px]">
+                    <div>
+                      <div className="text-slate mb-0.5">Winner</div>
+                      <div className="mono text-success">
+                        {a.winner.slice(0, 10)}...{a.winner.slice(-6)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-slate mb-0.5">Price Paid</div>
+                      <div className="mono text-success">
+                        {a.winningPrice.toString()} cUSDC
+                      </div>
+                    </div>
+                  </div>
+                )}
             </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

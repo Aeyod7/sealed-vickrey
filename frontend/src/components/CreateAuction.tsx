@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from "react";
 import { useAccount } from "wagmi";
 import { useZamaSDK } from "@zama-fhe/react-sdk";
-import { encodeAbiParameters, parseAbiParameters } from "viem";
 import { sealedVickreyABI } from "@/lib/abi";
 import {
   SEALED_VICKREY_ADDRESS,
@@ -56,7 +55,7 @@ export function CreateAuction() {
         abi: sealedVickreyABI,
         functionName: "createAuction",
         args: [
-          0, // LotKind.NFT
+          0,
           NFT_ADDRESS,
           BigInt(tokenId),
           BID_TOKEN_ADDRESS,
@@ -74,57 +73,60 @@ export function CreateAuction() {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <h2 className="text-lg font-semibold mb-4">Create Auction</h2>
+    <div className="card p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="heading text-base">Create Auction</h3>
+        <span className="text-[11px] text-slate mono">01</span>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1">NFT Token ID</label>
+        <div className="space-y-1.5">
+          <label className="label block">NFT Token ID</label>
           <input
             name="tokenId"
             type="number"
-            placeholder="e.g. 1"
+            placeholder="e.g. 0"
             required
-            className="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+            className="input w-full px-3 py-2"
           />
         </div>
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1">
-            Reserve Price (cUSDC units)
-          </label>
+        <div className="space-y-1.5">
+          <label className="label block">Reserve Price</label>
           <input
             name="reservePrice"
             type="number"
             placeholder="0 = no reserve"
-            className="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+            className="input w-full px-3 py-2"
           />
+          <p className="text-[11px] text-slate">cUSDC units</p>
         </div>
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1">
-            Duration (seconds)
-          </label>
+        <div className="space-y-1.5">
+          <label className="label block">Duration</label>
           <input
             name="duration"
             type="number"
-            placeholder="3600 = 1 hour"
+            placeholder="3600"
             defaultValue="3600"
             required
-            className="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+            className="input w-full px-3 py-2"
           />
+          <p className="text-[11px] text-slate">seconds (3600 = 1 hour)</p>
         </div>
         <button
           type="submit"
           disabled={isPending || !address}
-          className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors disabled:opacity-50 text-sm font-medium"
+          className="btn-primary w-full px-4 py-2.5 text-sm"
         >
           {isPending ? "Creating..." : "Create Auction"}
         </button>
       </form>
+
       {txHash && (
-        <p className="mt-3 text-sm text-green-400">
-          Created! TX: {txHash.slice(0, 18)}...
+        <p className="text-[12px] text-success mono">
+          ✓ Created · {txHash.slice(0, 18)}...
         </p>
       )}
-      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+      {error && <p className="text-[12px] text-error">{error}</p>}
     </div>
   );
 }

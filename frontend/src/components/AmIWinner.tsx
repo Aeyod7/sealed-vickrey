@@ -19,13 +19,11 @@ export function AmIWinner() {
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Permit gating — avoid unsolicited wallet popups
   const { data: hasPermit } = useHasPermit({
     contractAddresses: [SEALED_VICKREY_ADDRESS],
   });
   const { mutate: grantPermit, isPending: isGranting } = useGrantPermit();
 
-  // Only decrypt if we have a handle and permits
   const { data: decrypted } = useDecryptValues(
     encryptedHandle
       ? [{ encryptedValue: encryptedHandle, contractAddress: SEALED_VICKREY_ADDRESS }]
@@ -40,7 +38,6 @@ export function AmIWinner() {
     setIsChecking(true);
 
     try {
-      // Read the encrypted isWinner handle from the contract
       const handle = (await sdk.provider.readContract({
         address: SEALED_VICKREY_ADDRESS,
         abi: sealedVickreyABI,
@@ -63,35 +60,39 @@ export function AmIWinner() {
   const isWinner = result === true || result === BigInt(1);
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <h2 className="text-lg font-semibold mb-4">Did I Win? (Private Check)</h2>
-      <p className="text-sm text-zinc-400 mb-4">
+    <div className="card p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="heading text-base">Did I Win?</h3>
+        <span className="text-[11px] text-slate mono">05</span>
+      </div>
+
+      <p className="text-[13px] text-fog leading-relaxed">
         After settle, check privately whether you won. Only you learn the result
-        — via EIP-712 user decryption. No one else can see your winner status.
+        via EIP-712 user decryption.
       </p>
-      <div className="flex gap-3 mb-3">
+
+      <div className="flex gap-2">
         <input
           type="number"
           placeholder="Auction ID"
           value={auctionId}
           onChange={(e) => setAuctionId(e.target.value)}
-          className="flex-1 px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+          className="input flex-1 px-3 py-2"
         />
         <button
           onClick={handleCheck}
           disabled={isChecking || !address || !auctionId}
-          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors disabled:opacity-50 text-sm font-medium whitespace-nowrap"
+          className="btn-secondary px-4 py-2 text-sm whitespace-nowrap"
         >
           {isChecking ? "Checking..." : "Check"}
         </button>
       </div>
 
-      {/* Permit gate */}
       {encryptedHandle && !hasPermit && (
         <button
           onClick={() => grantPermit([SEALED_VICKREY_ADDRESS])}
           disabled={isGranting}
-          className="w-full px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 transition-colors text-sm font-medium mb-3"
+          className="btn-secondary w-full px-4 py-2 text-sm"
         >
           {isGranting
             ? "Sign in wallet..."
@@ -100,13 +101,24 @@ export function AmIWinner() {
       )}
 
       {result !== undefined && (
-        <p
-          className={`text-lg font-semibold ${isWinner ? "text-green-400" : "text-zinc-400"}`}
+        <div
+          className={`rounded-lg border p-4 text-center ${
+            isWinner
+              ? "border-emerald/30 bg-emerald/5"
+              : "border-graphite bg-obsidian"
+          }`}
         >
-          {isWinner ? "You won the auction!" : "You did not win."}
-        </p>
+          <p
+            className={`text-lg font-medium tracking-tight ${
+              isWinner ? "text-success" : "text-slate"
+            }`}
+          >
+            {isWinner ? "You won the auction" : "You did not win"}
+          </p>
+        </div>
       )}
-      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+
+      {error && <p className="text-[12px] text-error">{error}</p>}
     </div>
   );
 }

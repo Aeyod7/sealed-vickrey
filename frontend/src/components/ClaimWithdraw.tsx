@@ -21,7 +21,7 @@ export function ClaimWithdraw() {
     setIsPending(true);
 
     try {
-      const tx = await sdk.signer!.writeContract({
+      await sdk.signer!.writeContract({
         address: SEALED_VICKREY_ADDRESS,
         abi: sealedVickreyABI,
         functionName: action,
@@ -29,7 +29,7 @@ export function ClaimWithdraw() {
       });
       setSuccess(
         action === "claim"
-          ? "Claimed the lot! You paid the 2nd-highest bid."
+          ? "Claimed the lot. You paid the 2nd-highest bid."
           : "Withdrew your full bid.",
       );
     } catch (err) {
@@ -40,40 +40,49 @@ export function ClaimWithdraw() {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <h2 className="text-lg font-semibold mb-4">Claim / Withdraw</h2>
-      <p className="text-sm text-zinc-400 mb-4">
+    <div className="card p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="heading text-base">Claim & Withdraw</h3>
+        <span className="text-[11px] text-slate mono">06</span>
+      </div>
+
+      <p className="text-[13px] text-fog leading-relaxed">
         After finalization: the winner claims the lot (pays 2nd price, gets
         refund). Losers withdraw their full bid. All token movements stay
         encrypted.
       </p>
-      <div className="flex gap-3 mb-3">
+
+      <div className="flex gap-2">
         <input
           type="number"
           placeholder="Auction ID"
           value={auctionId}
           onChange={(e) => setAuctionId(e.target.value)}
-          className="flex-1 px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+          className="input flex-1 px-3 py-2"
         />
-      </div>
-      <div className="flex gap-3">
         <button
           onClick={() => handleAction("claim")}
           disabled={isPending || !address || !auctionId}
-          className="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors disabled:opacity-50 text-sm font-medium"
+          className="btn-primary px-4 py-2 text-sm whitespace-nowrap"
         >
-          {isPending ? "..." : "Claim (Winner)"}
+          {isPending ? "..." : "Claim"}
         </button>
         <button
           onClick={() => handleAction("withdraw")}
           disabled={isPending || !address || !auctionId}
-          className="flex-1 px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 transition-colors disabled:opacity-50 text-sm font-medium"
+          className="btn-secondary px-4 py-2 text-sm whitespace-nowrap"
         >
-          {isPending ? "..." : "Withdraw (Loser)"}
+          {isPending ? "..." : "Withdraw"}
         </button>
       </div>
-      {success && <p className="mt-3 text-sm text-green-400">{success}</p>}
-      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+
+      {success && (
+        <p className="text-[12px] text-success flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald" />
+          {success}
+        </p>
+      )}
+      {error && <p className="text-[12px] text-error">{error}</p>}
     </div>
   );
 }

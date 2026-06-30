@@ -17,6 +17,7 @@ export function SettleAuction() {
     secondPrice: string;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [auctionId, setAuctionId] = useState("");
 
   async function handleSettle(auctionId: string) {
     if (!address) return;
@@ -26,8 +27,7 @@ export function SettleAuction() {
     setIsPending(true);
 
     try {
-      // 1. Settle — computes max + second-max + winner (all encrypted)
-      setStatus("Settling (computing encrypted max + second-max)...");
+      setStatus("Settling — computing encrypted max + second-max...");
       await sdk.signer!.writeContract({
         address: SEALED_VICKREY_ADDRESS,
         abi: sealedVickreyABI,
@@ -35,7 +35,6 @@ export function SettleAuction() {
         args: [BigInt(auctionId)],
       });
 
-      // 2. Read the encrypted handles for public decryption
       setStatus("Reading encrypted results...");
       const auction = (await sdk.provider.readContract({
         address: SEALED_VICKREY_ADDRESS,
@@ -47,7 +46,6 @@ export function SettleAuction() {
       const secondPriceHandle = auction.secondHighestBid;
       const winnerHandle = auction.encryptedWinner;
 
-      // 3. Public decrypt both handles
       setStatus("Decrypting winner + second price...");
       const decryptResult = await decryptPublicValues.mutateAsync([
         secondPriceHandle,
@@ -59,9 +57,7 @@ export function SettleAuction() {
       ] as bigint;
       const clearWinner = decryptResult.clearValues[winnerHandle] as `0x${string}`;
 
-      // 4. Finalize — verify decryption on-chain
-      setStatus("Finalizing (verifying decryption proof on-chain)...");
-
+      setStatus("Finalizing — verifying proof on-chain...");
       await sdk.signer!.writeContract({
         address: SEALED_VICKREY_ADDRESS,
         abi: sealedVickreyABI,
@@ -87,44 +83,60 @@ export function SettleAuction() {
     }
   }
 
-  const [auctionId, setAuctionId] = useState("");
-
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <h2 className="text-lg font-semibold mb-4">Settle & Finalize</h2>
-      <p className="text-sm text-zinc-400 mb-4">
+    <div className="card p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="heading text-base">Settle & Finalize</h3>
+        <span className="text-[11px] text-slate mono">03</span>
+      </div>
+
+      <p className="text-[13px] text-fog leading-relaxed">
         After the auction ends, anyone can settle (compute encrypted winner +
-        second price) and finalize (reveal the winner address + price via public
-        decryption).
+        second price) and finalize (reveal the winner address + price).
       </p>
-      <div className="flex gap-3">
+
+      <div className="flex gap-2">
         <input
           type="number"
           placeholder="Auction ID"
           value={auctionId}
           onChange={(e) => setAuctionId(e.target.value)}
-          className="flex-1 px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-sm focus:border-indigo-500 outline-none"
+          className="input flex-1 px-3 py-2"
         />
         <button
           onClick={() => handleSettle(auctionId)}
           disabled={isPending || !address || !auctionId}
-          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors disabled:opacity-50 text-sm font-medium whitespace-nowrap"
+          className="btn-secondary px-4 py-2 text-sm whitespace-nowrap"
         >
           {isPending ? "Processing..." : "Settle + Finalize"}
         </button>
       </div>
-      {status && <p className="mt-3 text-sm text-blue-400">{status}</p>}
+
+      {status && (
+        <p className="text-[12px] text-status flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-indigo animate-pulse" />
+          {status}
+        </p>
+      )}
+
       {result && (
-        <div className="mt-3 space-y-1 text-sm">
-          <p className="text-green-400">
-            Winner: {result.winner.slice(0, 8)}...{result.winner.slice(-6)}
-          </p>
-          <p className="text-green-400">
-            Winning Price (2nd highest bid): {result.secondPrice} cUSDC
-          </p>
+        <div className="space-y-1.5 rounded-lg border border-graphite bg-obsidian p-4">
+          <div className="flex items-center justify-between">
+            <span className="label">Winner</span>
+            <span className="mono text-[12px] text-success">
+              {result.winner.slice(0, 8)}...{result.winner.slice(-6)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="label">Winning Price</span>
+            <span className="mono text-[12px] text-success">
+              {result.secondPrice} cUSDC
+            </span>
+          </div>
         </div>
       )}
-      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+
+      {error && <p className="text-[12px] text-error">{error}</p>}
     </div>
   );
 }
