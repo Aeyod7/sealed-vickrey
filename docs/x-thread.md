@@ -64,8 +64,8 @@ Applications: treasury auctions, spectrum licenses, carbon credits, DeFi liquida
 
 ---
 
-9/ Try it live: [deployed URL]
-Source code: [GitHub URL]
+9/ Try it live: https://sealed-vickrey.vercel.app
+Source code: https://github.com/Aeyod7/sealed-vickrey
 
 Built for @zama_fhe Developer Program Season 3 — Builder Track.
 

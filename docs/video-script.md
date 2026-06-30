@@ -106,7 +106,7 @@ matter.
 ### [2:50–3:00] Call to Action
 
 **Narration:**
-Sealed is open source and deployed on Sepolia. Try it at [URL]. Built for Zama
+Sealed is open source and deployed on Sepolia. Try it at https://sealed-vickrey.vercel.app. Built for Zama
 Developer Program Season 3.
 
 **On-screen:** GitHub URL, deployed app URL, "Built with FHEVM" logo
