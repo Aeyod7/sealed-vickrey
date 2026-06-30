@@ -7,6 +7,7 @@ import { SettleAuction } from "@/components/SettleAuction";
 import { ClaimWithdraw } from "@/components/ClaimWithdraw";
 import { AmIWinner } from "@/components/AmIWinner";
 import { AuctionList } from "@/components/AuctionList";
+import { Faucet } from "@/components/Faucet";
 
 export default function Home() {
   return (
@@ -72,12 +73,15 @@ export default function Home() {
             </p>
           </section>
 
-          {/* Action grid */}
-          <section className="grid md:grid-cols-2 gap-4">
-            <CreateAuction />
-            <PlaceBid />
-            <SettleAuction />
-            <AmIWinner />
+          {/* Faucet + action grid */}
+          <section className="space-y-4">
+            <Faucet />
+            <div className="grid md:grid-cols-2 gap-4">
+              <CreateAuction />
+              <PlaceBid />
+              <SettleAuction />
+              <AmIWinner />
+            </div>
           </section>
 
           {/* Claim / Withdraw */}

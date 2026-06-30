@@ -9,7 +9,10 @@ import { sepolia as sepoliaFhe } from "@zama-fhe/sdk/chains";
 export const SEALED_VICKREY_ADDRESS =
   "0xE36671102739432754bE48d660F11f89465f3c6e" as `0x${string}`;
 export const BID_TOKEN_ADDRESS =
-  "0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639" as `0x${string}`; // cUSDCMock
+  "0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639" as `0x${string}`; // cUSDCMock wrapper
+export const CUSDC_WRAPPER_ADDRESS = BID_TOKEN_ADDRESS;
+export const UNDERLYING_USDC_ADDRESS =
+  "0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF" as `0x${string}`; // cUSDCMock underlying
 export const NFT_ADDRESS =
   "0x6AC371141950F7958afA00494AD81b725Dd433f1" as `0x${string}`;
 
