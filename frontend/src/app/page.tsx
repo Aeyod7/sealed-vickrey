@@ -8,6 +8,7 @@ import { ClaimWithdraw } from "@/components/ClaimWithdraw";
 import { AmIWinner } from "@/components/AmIWinner";
 import { AuctionList } from "@/components/AuctionList";
 import { Faucet } from "@/components/Faucet";
+import { PrivacyProof } from "@/components/PrivacyProof";
 
 export default function Home() {
   return (
@@ -83,6 +84,9 @@ export default function Home() {
               <AmIWinner />
             </div>
           </section>
+
+          {/* On-chain privacy proof */}
+          <PrivacyProof />
 
           {/* Claim / Withdraw */}
           <ClaimWithdraw />
