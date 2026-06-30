@@ -6,6 +6,7 @@ import { PlaceBid } from "@/components/PlaceBid";
 import { SettleAuction } from "@/components/SettleAuction";
 import { ClaimWithdraw } from "@/components/ClaimWithdraw";
 import { AmIWinner } from "@/components/AmIWinner";
+import { AuctionList } from "@/components/AuctionList";
 
 export default function Home() {
   return (
@@ -53,6 +54,9 @@ export default function Home() {
           </div>
 
           <ClaimWithdraw />
+
+          {/* Auction list */}
+          <AuctionList />
 
           {/* How it works */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
