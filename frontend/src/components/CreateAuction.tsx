@@ -14,6 +14,7 @@ export function CreateAuction() {
   const sdk = useZamaSDK();
   const { address } = useAccount();
   const [isPending, setIsPending] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,6 +23,7 @@ export function CreateAuction() {
     if (!address) return;
     setError(null);
     setTxHash(null);
+    setStatus(null);
     setIsPending(true);
 
     try {
@@ -30,8 +32,9 @@ export function CreateAuction() {
       const reservePrice = formData.get("reservePrice") as string;
       const duration = formData.get("duration") as string;
 
-      // Approve NFT transfer to the auction contract
-      await sdk.signer!.writeContract({
+      // 1. Approve NFT transfer to the auction contract
+      setStatus("Approving NFT transfer...");
+      const approveHash = await sdk.signer!.writeContract({
         address: NFT_ADDRESS,
         abi: [
           {
@@ -49,7 +52,12 @@ export function CreateAuction() {
         args: [SEALED_VICKREY_ADDRESS, BigInt(tokenId)],
       });
 
-      // Create auction: LotKind.NFT = 0
+      // 2. Wait for the approval to be confirmed
+      setStatus("Waiting for approval confirmation...");
+      await sdk.provider.waitForTransactionReceipt(approveHash);
+
+      // 3. Create auction: LotKind.NFT = 0
+      setStatus("Creating auction...");
       const tx = await sdk.signer!.writeContract({
         address: SEALED_VICKREY_ADDRESS,
         abi: sealedVickreyABI,
@@ -65,8 +73,10 @@ export function CreateAuction() {
       });
 
       setTxHash(tx);
+      setStatus(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create auction");
+      setStatus(null);
     } finally {
       setIsPending(false);
     }
@@ -117,7 +127,7 @@ export function CreateAuction() {
           disabled={isPending || !address}
           className="btn-primary w-full px-4 py-2.5 text-sm"
         >
-          {isPending ? "Creating..." : "Create Auction"}
+          {isPending ? status || "Creating..." : "Create Auction"}
         </button>
       </form>
 

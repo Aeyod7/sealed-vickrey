@@ -27,15 +27,8 @@ export function SettleAuction() {
     setIsPending(true);
 
     try {
-      setStatus("Settling — computing encrypted max + second-max...");
-      await sdk.signer!.writeContract({
-        address: SEALED_VICKREY_ADDRESS,
-        abi: sealedVickreyABI,
-        functionName: "settle",
-        args: [BigInt(auctionId)],
-      });
-
-      setStatus("Reading encrypted results...");
+      // Read current auction state
+      setStatus("Reading auction state...");
       const auction = (await sdk.provider.readContract({
         address: SEALED_VICKREY_ADDRESS,
         abi: sealedVickreyABI,
@@ -43,20 +36,61 @@ export function SettleAuction() {
         args: [BigInt(auctionId)],
       })) as any;
 
+      const state = Number(auction.state);
+      const now = Math.floor(Date.now() / 1000);
+      const endTime = Number(auction.endTime);
       const secondPriceHandle = auction.secondHighestBid;
       const winnerHandle = auction.encryptedWinner;
 
-      setStatus("Decrypting winner + second price...");
+      if (state === 0 && now < endTime) {
+        throw new Error(`Auction ends in ${endTime - now} seconds. Wait until then.`);
+      }
+
+      // Only settle if not already settled
+      if (state === 0) {
+        setStatus("Settling — computing encrypted max + second-max...");
+        const settleHash = await sdk.signer!.writeContract({
+          address: SEALED_VICKREY_ADDRESS,
+          abi: sealedVickreyABI,
+          functionName: "settle",
+          args: [BigInt(auctionId)],
+        });
+        await sdk.provider.waitForTransactionReceipt(settleHash);
+
+        // Re-read auction after settle
+        const settledAuction = (await sdk.provider.readContract({
+          address: SEALED_VICKREY_ADDRESS,
+          abi: sealedVickreyABI,
+          functionName: "getAuction",
+          args: [BigInt(auctionId)],
+        })) as any;
+      }
+
+      // Ensure handles are non-zero
+      if (
+        secondPriceHandle ===
+          "0x0000000000000000000000000000000000000000000000000000000000000000" ||
+        winnerHandle ===
+          "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ) {
+        throw new Error("Encrypted handles are empty. Settlement may have failed.");
+      }
+
+      // Public decrypt both handles
+      setStatus("Decrypting winner + second price via Zama relayer...");
       const decryptResult = await decryptPublicValues.mutateAsync([
         secondPriceHandle,
         winnerHandle,
       ]);
 
-      const clearSecondPrice = decryptResult.clearValues[
-        secondPriceHandle
-      ] as bigint;
+      const clearSecondPrice = decryptResult.clearValues[secondPriceHandle] as bigint;
       const clearWinner = decryptResult.clearValues[winnerHandle] as `0x${string}`;
 
+      if (clearSecondPrice === undefined || clearWinner === undefined) {
+        throw new Error("Public decryption returned empty values. Try again in a few seconds.");
+      }
+
+      // Finalize
       setStatus("Finalizing — verifying proof on-chain...");
       await sdk.signer!.writeContract({
         address: SEALED_VICKREY_ADDRESS,
@@ -136,7 +170,18 @@ export function SettleAuction() {
         </div>
       )}
 
-      {error && <p className="text-[12px] text-error">{error}</p>}
+      {error && (
+        <div className="space-y-2">
+          <p className="text-[12px] text-error">{error}</p>
+          <button
+            onClick={() => handleSettle(auctionId)}
+            disabled={isPending || !address || !auctionId}
+            className="text-[12px] text-fog hover:text-snow underline"
+          >
+            Retry
+          </button>
+        </div>
+      )}
     </div>
   );
 }
