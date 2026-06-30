@@ -178,6 +178,35 @@ npm run dev
 
 Update `frontend/src/lib/config.ts` with the deployed contract addresses.
 
+## Privacy proof
+
+You can verify on-chain that only the winner address and second price are public. Every individual bid stays encrypted as a `bytes32` FHE ciphertext handle.
+
+```bash
+node scripts/privacy-proof.js 2
+```
+
+Example output for a finalized auction:
+
+```
+🔓 PUBLIC DATA (visible to everyone)
+────────────────────────────────────
+Seller:          0xBE55...A75B
+Lot token:       0x6AC3...33f1 #2
+Bid count:       2
+Winner:          0xBE55...A75B
+Winning price:   200 cUSDC
+
+🔒 PRIVATE DATA (encrypted — never decrypted on-chain)
+──────────────────────────────────────────────────────
+Max bid handle:          0x49669a8ab074d87439ff1b84bad67d39d4ec069254ff0000000000aa36a70500
+Second-highest handle:   0xabe1fb8222ff670585876d01d89f1f6a6885507b58ff0000000000aa36a70500
+Encrypted winner handle: 0xf2047306c2bb57f285f9c9339a8200da7ffdd8538aff0000000000aa36a70700
+```
+
+Check the contract directly on Sepolia Etherscan:
+https://sepolia.etherscan.io/address/0xE36671102739432754bE48d660F11f89465f3c6e
+
 ## Test results
 
 ```
