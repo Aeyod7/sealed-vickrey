@@ -4,6 +4,11 @@
 
 Built for **Zama Developer Program Mainnet Season 3** — Builder Track.
 
+- **Live demo:** https://sealed-vickrey.vercel.app
+- **Source code:** https://github.com/Aeyod7/sealed-vickrey
+- **Network:** Sepolia testnet
+- **Bid currency:** Zama cUSDCMock (`0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639`)
+
 ## Why FHE? Why Vickrey?
 
 ### The problem
@@ -88,6 +93,14 @@ This is O(n) with 3 FHE operations per bid — feasible on FHEVM.
 - **`amIWinner`** — returns encrypted boolean for private winner check
 - **`claim`** — winner pays 2nd price, gets lot + refund (encrypted transfers)
 - **`withdraw`** — losers withdraw full bid (encrypted transfer)
+
+## Deployed contracts (Sepolia)
+
+| Contract | Address |
+|----------|---------|
+| `SealedVickrey` | `0xE36671102739432754bE48d660F11f89465f3c6e` |
+| `MockNFT` | `0x6AC371141950F7958afA00494AD81b725Dd433f1` |
+| `cUSDCMock` (bid token) | `0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639` |
 
 ## Tech stack
 
