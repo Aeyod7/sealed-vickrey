@@ -320,6 +320,7 @@ contract SealedVickrey is ZamaEthereumConfig, IERC7984Receiver {
         // Transfer second price (encrypted) to seller
         euint64 payment = FHE.asEuint64(a.winningPrice);
         FHE.allowThis(payment);
+        FHE.allow(payment, a.bidToken);
         IERC7984(a.bidToken).confidentialTransfer(a.seller, payment);
 
         // Refund difference (winnerBid - secondPrice) to winner — stays encrypted
@@ -327,6 +328,7 @@ contract SealedVickrey is ZamaEthereumConfig, IERC7984Receiver {
         euint64 refund = FHE.sub(winnerBid, payment);
         FHE.allowThis(refund);
         FHE.allow(refund, msg.sender);
+        FHE.allow(refund, a.bidToken);
         IERC7984(a.bidToken).confidentialTransfer(msg.sender, refund);
 
         // Transfer lot to winner
@@ -355,6 +357,7 @@ contract SealedVickrey is ZamaEthereumConfig, IERC7984Receiver {
 
         euint64 bidAmount = bids[auctionId][msg.sender];
         FHE.allowThis(bidAmount);
+        FHE.allow(bidAmount, a.bidToken);
         IERC7984(a.bidToken).confidentialTransfer(msg.sender, bidAmount);
 
         emit BidWithdrawn(auctionId, msg.sender);
